@@ -20,8 +20,10 @@ define([
         },
 
         initialize: function () {
+            
+            
             this._super();
-            jquery('#'+this.uid).mask('00000-000', {clearIfNotMatch: true});
+            //jquery('#'+this.uid).mask('00000-000', {clearIfNotMatch: true});
             return this;
         },
 
@@ -36,6 +38,8 @@ define([
             if (!value) {
                 return;
             }
+            
+           
 
             if(options[value]){
                 option = options[value];
@@ -62,15 +66,25 @@ define([
             //    this.firstLoad = false;
             //    return;
             //}
-
-            if(validate.valid == true && this.value() && this.value().length == 9){
+            
+            var country = jQuery("[name=country_id]").val()
+            
+            if (country=='BR') {
+                jquery('#'+this.uid).mask('00000-000', {clearIfNotMatch: true});
+            } else {
+                jquery('#'+this.uid).unmask();
+            }
+            
+            //alert(country);
+            
+            var value = this.value();
+            value = value.replace('-', '');
+            
+            if(validate.valid == true && value && value.length == 8 && country =='BR'){
                 jquery('#checkout').append(checkoutLoader);
 
                 var element = this;
-
-                var value = this.value();
-                value = value.replace('-', '');
-
+                
                 var ajaxurl = url.build("brcustomer/consult/address/zipcode/"+value);
 
                 jquery.getJSON(ajaxurl, null, function(data) {
@@ -95,8 +109,11 @@ define([
                         if(registry.get(element.parentName + '.' + 'country_id')){
                             registry.get(element.parentName + '.' + 'country_id').value('BR');
                         }
+                        
+                        jquery("[name=street\\[1\\]]").focus();
                     }
                     jquery('#checkout-loader').remove();
+                    
                 });
             }else{
                 jquery('#checkout-loader').remove();
